@@ -29,7 +29,7 @@ jobs:
           cp -r index.html manifest.json sw.js icons fonts app/www/
           cd app
           npm init -y > /dev/null
-          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/filesystem@6 @capacitor/share@6 @capacitor/status-bar@6 @capacitor/haptics@6 @capacitor/app@6
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/filesystem@6 @capacitor/share@6 @capacitor/status-bar@6 @capacitor/haptics@6 @capacitor/app@6 @capacitor/local-notifications@6
           npx cap init "Cheshbon HaNefesh" com.yankyweber.cheshbon --web-dir www
           npx cap add android
           npx cap sync android
@@ -38,6 +38,12 @@ jobs:
         run: |
           pip install pillow
           python build/icons.py
+
+      - name: Notification permission
+        run: |
+          M=app/android/app/src/main/AndroidManifest.xml
+          grep -q POST_NOTIFICATIONS $M || sed -i 's#</manifest>#    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n</manifest>#' $M
+          grep -n "uses-permission" $M
 
       - name: Version and signing key
         run: |

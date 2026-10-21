@@ -26,15 +26,16 @@
       --sunk: #E4E7DF;
       --ink: #1E2533;
       --ink-2: #4A5262;
-      --ink-3: #7D8494;
+      --ink-3: #646B7A;
       --rule: #D5D9CF;
-      --kept: #2F7A6B;
+      --kept: #2A6F61;
       --kept-wash: #DCEBE5;
       --slip: #A8323A;
       --slip-wash: #F3DEDD;
-      --brass: #9A7A2E;
+      --brass: #846622;
       --brass-wash: #EFE6CF;
       --scrim: rgba(20, 25, 35, 0.42);
+      --on-mark: #FFFFFF;
       --serif: "Frank", "Times New Roman", serif;
       --sans: "Instrument", -apple-system, "Segoe UI", Roboto, sans-serif;
       --r-sm: 8px; --r-md: 14px; --r-lg: 22px;
@@ -46,7 +47,7 @@
       --sunk: #0E1218;
       --ink: #E7EAE3;
       --ink-2: #B4BAC2;
-      --ink-3: #7F8792;
+      --ink-3: #969DA8;
       --rule: #29313C;
       --kept: #5FB3A0;
       --kept-wash: #1D3330;
@@ -55,6 +56,7 @@
       --brass: #CDAA5A;
       --brass-wash: #332B1A;
       --scrim: rgba(0, 0, 0, 0.55);
+      --on-mark: #0E1218;
       color-scheme: dark;
     }
 
@@ -129,8 +131,8 @@
     .seg { display: flex; background: var(--sunk); border-radius: 12px; padding: 3px; gap: 2px; flex: none; }
     .seg button { width: 42px; height: 36px; border-radius: 9px; display: grid; place-items: center; color: var(--ink-3); transition: background 0.15s, color 0.15s; }
     .seg button svg { width: 18px; height: 18px; stroke-width: 2.2; }
-    .seg button.on.kept { background: var(--kept); color: #fff; }
-    .seg button.on.slip { background: var(--slip); color: #fff; }
+    .seg button.on.kept { background: var(--kept); color: var(--on-mark); }
+    .seg button.on.slip { background: var(--slip); color: var(--on-mark); }
     .quick { display: block; margin: 0 auto 26px; padding: 10px 14px; font-size: 14px; font-weight: 500; color: var(--kept); }
     .quick[hidden] { display: none; }
 
@@ -193,13 +195,29 @@
     .segtext { display: flex; background: var(--sunk); border-radius: 10px; padding: 3px; }
     .segtext button { padding: 6px 10px; border-radius: 8px; font-size: 13px; color: var(--ink-2); }
     .segtext button.on { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.12); }
+    .switch { width: 50px; height: 30px; border-radius: 15px; background: var(--rule); position: relative; flex: none; transition: background 0.18s; }
+    .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: transform 0.18s; }
+    .switch[aria-checked="true"] { background: var(--kept); }
+    .switch[aria-checked="true"]::after { transform: translateX(20px); }
+    .switch:disabled { opacity: 0.4; }
+    .row input[type="time"] { background: var(--sunk); border: none; border-radius: 8px; padding: 6px 8px; font-size: 15px; }
+    .row.off { opacity: 0.45; pointer-events: none; }
+    .row .main .b.wrap { white-space: normal; }
+    .nudge { background: var(--brass-wash); border-radius: var(--r-lg); padding: 14px 16px; margin-bottom: 22px; }
+    .nudge b { display: block; font-family: var(--serif); font-weight: 500; font-size: 18px; margin-bottom: 3px; }
+    .nudge p { color: var(--ink-2); font-size: 14px; margin-bottom: 12px; }
+    .nudge .acts { display: flex; gap: 6px; }
+    .nudge .acts button { min-height: 40px; padding: 0 16px; border-radius: 10px; font-weight: 600; font-size: 14px; }
+    .nudge .go { background: var(--ink); color: var(--paper); }
+    .nudge .later { color: var(--ink-2); }
+    .topline .sub.streak { color: var(--kept); font-weight: 600; }
     .foot { text-align: center; font-size: 12px; color: var(--ink-3); margin-top: 26px; }
 
     /* ---------- Buttons ---------- */
     .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 50px; border-radius: var(--r-md); font-weight: 600; font-size: 16px; }
     .btn.primary { background: var(--ink); color: var(--paper); }
     .btn.plain { color: var(--ink-2); }
-    .btn.danger { background: var(--slip); color: #fff; }
+    .btn.danger { background: var(--slip); color: var(--on-mark); }
     .btn:active { transform: scale(0.985); }
 
     /* ---------- Sheet ---------- */
@@ -278,6 +296,7 @@
     <p class="lede">Pick a list to begin with. You can rename, reorder or add to it at any time.</p>
     <button class="choice" data-c="custom"><b>My own list</b><span>Choose how many traits and name each one</span></button>
     <button class="choice" data-c="cheshbon"><b>Cheshbon HaNefesh</b><span>The thirteen middos, with their Hebrew names</span></button>
+    <button class="choice" data-c="everyday"><b>Everyday character</b><span>Seven plain-English traits for daily life</span></button>
     <button class="choice" data-c="franklin"><b>Benjamin Franklin</b><span>His thirteen virtues</span></button>
     <button class="btn plain" id="stRestore" style="margin-top:8px">Restore from a backup</button>
   </div>
@@ -326,6 +345,12 @@
     <button class="shift" id="wNext" aria-label="Next week"><svg class="i"><use href="#i-right"/></svg></button>
   </div>
 
+  <div class="nudge" id="nudge" hidden>
+    <b>Back up your entries</b>
+    <p id="nudgeText"></p>
+    <div class="acts"><button class="go" id="nudgeGo">Export backup</button><button class="later" id="nudgeLater">Not now</button></div>
+  </div>
+
   <div class="sec-h"><h3 id="listTitle">Tonight's accounting</h3><span class="count" id="tCount"></span></div>
   <div class="list" id="list"></div>
   <button class="quick" id="quick" hidden>Mark the rest as kept</button>
@@ -359,8 +384,8 @@
     <div class="key"><span><i class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--slip)"></i>Slipped</span><span><i style="display:inline-block;width:9px;height:2px;background:var(--kept)"></i>Kept</span></div>
   </div>
   <div class="figures">
-    <div><b id="fgSlips">0</b><span>Slips</span></div>
-    <div><b id="fgFocus">0</b><span>On the focus</span></div>
+    <div><b id="fgDone">0</b><span>Nights complete</span></div>
+    <div><b id="fgSlips">0</b><span id="fgSlipsL">Slips</span></div>
     <div><b id="fgSleep">—</b><span>Average sleep</span></div>
   </div>
   <div class="sec-h"><h3>Reflections</h3></div>
@@ -381,6 +406,15 @@
   <div class="group-h">Cycle</div>
   <div class="group">
     <label class="row"><span class="main"><span class="a">Week one began</span><div class="b" id="cycleNote"></div></span><input type="date" id="cycleStart" /></label>
+  </div>
+
+  <div class="group-h">Reminder</div>
+  <div class="group">
+    <div class="row" id="remRow"><span class="main"><span class="a">Nightly reminder</span><div class="b wrap" id="remNote"></div></span>
+      <button class="switch" id="remSwitch" role="switch" aria-checked="false" aria-label="Nightly reminder"></button></div>
+    <label class="row" id="remTimeRow"><span class="main"><span class="a">Time</span></span><input type="time" id="remTime" /></label>
+    <div class="row"><span class="main"><span class="a">Shabbos</span><div class="b wrap">No reminder Friday night, and it won’t break your streak</div></span>
+      <button class="switch" id="shabSwitch" role="switch" aria-checked="true" aria-label="Shabbos"></button></div>
   </div>
 
   <div class="group-h">Appearance</div>
@@ -435,6 +469,15 @@
       ['Emes', 'אמת', 'Let nothing leave your mouth that isn’t true.'],
       ['Prishus', 'פרישות', 'Take from permitted pleasures only what you need.']
     ],
+    everyday: [
+      ['Listening', '', 'Let people finish. Hear what they mean before answering.'],
+      ['Patience', '', 'Wait without irritation, with people and with plans.'],
+      ['Staying calm', '', 'Catch anger early and answer slowly.'],
+      ['Gratitude', '', 'Notice what others did for you, and say thank you.'],
+      ['Seeing the good', '', 'Judge people favorably; look for what is right.'],
+      ['Honesty', '', 'Say what is true, including the small things.'],
+      ['Keeping my word', '', 'Do what I said I would, when I said I would.']
+    ],
     franklin: [
       ['Temperance', '', 'Eat not to dullness; drink not to elevation.'],
       ['Silence', '', 'Speak not but what may benefit others or yourself.'],
@@ -478,7 +521,9 @@
   }
   let S = load();
   if (S.setupDone === undefined) S.setupDone = true;
-  function save() { try { localStorage.setItem(STORE, JSON.stringify(S)); return true; } catch (e) { toast('Couldn’t save — phone storage may be full'); return false; } }
+  if (!S.reminder) S.reminder = { on: false, time: '21:30' };
+  if (S.shabbos === undefined) S.shabbos = true;
+  function save() { queueReminders(); try { localStorage.setItem(STORE, JSON.stringify(S)); return true; } catch (e) { toast('Couldn’t save. Phone storage may be full.'); return false; } }
 
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -534,13 +579,65 @@
     return S.logs[k] || { traits: {} };
   };
 
+  const isComplete = k => { const l = S.logs[k]; return !!(l && l.traits && S.traits.length && S.traits.every(t => l.traits[t.id])); };
+  const isShabbosNight = k => S.shabbos !== false && parseKey(k).getDay() === 5;
+  function streak() {
+    let k = todayKey(), n = 0;
+    if (!isComplete(k)) k = shiftKey(k, -1);
+    for (let g = 0; g < 4000; g++) {
+      if (isComplete(k)) n++; else if (!isShabbosNight(k)) break;
+      k = shiftKey(k, -1);
+    }
+    return n;
+  }
+  const nights = n => n === 1 ? '1 night' : `${n} nights`;
+
+  // ================= Reminders (APK) =================
+  const LN = () => P('LocalNotifications');
+  const fmtTime = t => { const [h, m] = t.split(':').map(Number); return new Date(2000, 0, 1, h, m).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); };
+  let remTimer;
+  function queueReminders() { if (!LN()) return; clearTimeout(remTimer); remTimer = setTimeout(scheduleReminders, 700); }
+  async function scheduleReminders() {
+    const ln = LN(); if (!ln) return;
+    try {
+      const pend = await ln.getPending();
+      if (pend.notifications.length) await ln.cancel({ notifications: pend.notifications.map(n => ({ id: n.id })) });
+      if (!S.reminder.on) return;
+      const [h, m] = S.reminder.time.split(':').map(Number), now = new Date(), list = [];
+      for (let i = 0; i < 30; i++) {
+        const d = addDays(now, i); d.setHours(h, m, 0, 0);
+        const k = keyOf(d);
+        if (d <= now || isShabbosNight(k) || (i === 0 && isComplete(k))) continue;
+        const f = focusFor(k);
+        list.push({ id: 100 + i, title: 'Tonight’s accounting', body: f ? `This week: ${f.t.name}. Take a minute to review the day.` : 'Take a minute to review the day.',
+          schedule: { at: d, allowWhileIdle: true }, smallIcon: 'ic_stat_icon', iconColor: '#2A6F61' });
+      }
+      if (list.length) await ln.schedule({ notifications: list });
+    } catch (e) {}
+  }
+  async function setReminder(on) {
+    const ln = LN(); if (!ln) return;
+    if (on) {
+      try {
+        let perm = await ln.checkPermissions();
+        if (perm.display !== 'granted') perm = await ln.requestPermissions();
+        if (perm.display !== 'granted') { toast('Notifications are blocked. Allow them in Android settings.'); return; }
+      } catch (e) { toast('Couldn’t turn on the reminder'); return; }
+    }
+    S.reminder.on = on; save(); renderSettings(); await scheduleReminders();
+    toast(on ? `Reminder set for ${fmtTime(S.reminder.time)}` : 'Reminder off');
+  }
+
   // ================= Today =================
   let viewDay = todayKey();
 
   function renderToday() {
     const t = todayKey(), dd = diffDays(viewDay, t);
     $('dDay').textContent = fmt(viewDay, { weekday: 'long', month: 'long', day: 'numeric' });
-    $('dSub').textContent = dd === 0 ? 'Today' : dd === 1 ? 'Yesterday' : `${dd} days ago`;
+    const st = streak();
+    $('dSub').textContent = dd === 0 ? (st >= 2 ? `${nights(st)} in a row` : 'Today') : dd === 1 ? 'Yesterday' : `${dd} days ago`;
+    $('dSub').classList.toggle('streak', dd === 0 && st >= 2);
+    renderNudge();
     $('listTitle').textContent = dd === 0 ? 'Tonight’s accounting' : 'Accounting';
 
     const f = focusFor(viewDay), focus = $('focus');
@@ -593,20 +690,40 @@
         </div></div>`;
     }).join('') : '<div class="t"><span class="empty">No traits yet. Add them in Settings.</span></div>';
     $('tCount').textContent = order.length ? `${marked} of ${order.length}` : '';
-    $('quick').hidden = !(marked > 0 && marked < order.length);
+    $('quick').hidden = !(order.length && marked < order.length);
+    $('quick').textContent = marked ? 'Mark the rest as kept' : 'Mark all as kept';
   }
   $('list').onclick = e => {
     const b = e.target.closest('.seg button'); if (!b) return;
+    const wasDone = isComplete(viewDay);
     const log = dayLog(viewDay, true);
     if (log.traits[b.dataset.id] === b.dataset.s) delete log.traits[b.dataset.id];
     else log.traits[b.dataset.id] = b.dataset.s;
     save(); tap(); renderList(); renderWeek();
-    if (Object.keys(log.traits).length === S.traits.length && S.traits.length) { tap('success'); toast('Accounting complete'); }
+    if (!wasDone && isComplete(viewDay)) celebrate();
+    else if (wasDone !== isComplete(viewDay)) renderToday();
   };
+  function celebrate() {
+    tap('success');
+    const st = streak();
+    toast(viewDay === todayKey() && st >= 2 ? `Accounting complete. ${nights(st)} in a row.` : 'Accounting complete');
+    renderToday();
+  }
+  function renderNudge() {
+    const days = Object.keys(S.logs).filter(k => Object.keys(S.logs[k].traits || {}).length || (S.logs[k].note || '').trim()).length;
+    const since = S.lastBackup ? diffDays(S.lastBackup, todayKey()) : Infinity;
+    const show = days >= 7 && since >= 14 && !(S.backupSnooze && S.backupSnooze > todayKey()) && viewDay === todayKey();
+    $('nudge').hidden = !show;
+    if (show) $('nudgeText').textContent = S.lastBackup
+      ? `Your last backup was ${since} days ago. Export a new one so recent entries are safe too.`
+      : `You have ${days} days of entries, saved only on this phone. A backup file keeps them if the phone is lost or the app is removed.`;
+  }
+  $('nudgeGo').onclick = () => exportBackup();
+  $('nudgeLater').onclick = () => { S.backupSnooze = shiftKey(todayKey(), 7); save(); renderNudge(); };
   $('quick').onclick = () => {
     const log = dayLog(viewDay, true);
     S.traits.forEach(t => { if (!log.traits[t.id]) log.traits[t.id] = 'pass'; });
-    save(); tap('success'); renderList(); renderWeek(); toast('Accounting complete');
+    save(); renderList(); renderWeek(); celebrate();
   };
 
   function sleepMin(log) {
@@ -647,7 +764,9 @@
     });
     $('grid').innerHTML = html;
     const sl = days.map(k => sleepMin(S.logs[k])).filter(m => m != null);
-    $('fgSlips').textContent = slips; $('fgFocus').textContent = onFocus;
+    const done = days.filter(isComplete).length, upto = days.filter(k => k <= t).length;
+    $('fgDone').textContent = `${done}/${upto}`;
+    $('fgSlips').textContent = slips; $('fgSlipsL').textContent = onFocus ? `Slips, ${onFocus} on the focus` : 'Slips';
     $('fgSleep').textContent = sl.length ? fmtMin(sl.reduce((a, b) => a + b, 0) / sl.length) : '—';
     const notes = days.filter(k => S.logs[k]?.note?.trim());
     $('entries').innerHTML = notes.length
@@ -669,6 +788,13 @@
     const f = focusFor(todayKey());
     $('cycleNote').textContent = f && f.w >= 0 ? `This week: ${f.t.name}` : 'Your cycle hasn’t started yet';
     document.querySelectorAll('#themeSeg button').forEach(b => b.classList.toggle('on', b.dataset.t === (S.theme || 'system')));
+    const native = !!LN();
+    $('remSwitch').setAttribute('aria-checked', String(native && S.reminder.on));
+    $('remSwitch').disabled = !native;
+    $('remTime').value = S.reminder.time;
+    $('remTimeRow').classList.toggle('off', !native || !S.reminder.on);
+    $('remNote').textContent = !native ? 'Available in the Android app (APK)' : S.reminder.on ? `Every night at ${fmtTime(S.reminder.time)}, skipped once you’re done` : 'Off';
+    $('shabSwitch').setAttribute('aria-checked', String(S.shabbos !== false));
     $('lastBackup').textContent = S.lastBackup ? `Last exported ${fmt(S.lastBackup, { month: 'short', day: 'numeric', year: 'numeric' })}` : 'Not exported yet';
   }
 
@@ -703,6 +829,9 @@
   $('addTrait').onclick = () => editTrait(null);
   $('newList').onclick = () => openSetup(true);
   $('cycleStart').addEventListener('change', () => { if (!$('cycleStart').value) return; S.cycleStart = $('cycleStart').value; chartStart = null; save(); renderSettings(); toast('Cycle updated'); });
+  $('remSwitch').onclick = () => setReminder(!S.reminder.on);
+  $('remTime').addEventListener('change', () => { if (!$('remTime').value) return; S.reminder.time = $('remTime').value; save(); renderSettings(); toast(`Reminder set for ${fmtTime(S.reminder.time)}`); });
+  $('shabSwitch').onclick = () => { S.shabbos = S.shabbos === false; save(); renderSettings(); };
   $('themeSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.theme = b.dataset.t; save(); applyTheme(); renderSettings(); };
 
   function applyTheme() {
@@ -716,7 +845,8 @@
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
 
   // Backup
-  $('exportBtn').onclick = async () => {
+  $('exportBtn').onclick = () => exportBackup();
+  async function exportBackup() {
     const json = JSON.stringify({ app: 'cheshbon-hanefesh', version: 2, exported: new Date().toISOString(), data: S }, null, 2);
     const name = `cheshbon-backup-${todayKey()}.json`;
     try {
@@ -728,9 +858,9 @@
         if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: 'Cheshbon HaNefesh backup' });
         else { const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000); }
       }
-      S.lastBackup = todayKey(); save(); renderSettings(); toast('Backup exported');
-    } catch (e) { if (e.name !== 'AbortError' && !/cancel/i.test(e.message || '')) toast('Export didn’t finish — try again'); }
-  };
+      S.lastBackup = todayKey(); S.backupSnooze = null; save(); renderSettings(); renderNudge(); toast('Backup exported');
+    } catch (e) { if (e.name !== 'AbortError' && !/cancel/i.test(e.message || '')) toast('Export didn’t finish. Try again.'); }
+  }
   $('importBtn').onclick = () => $('importFile').click();
   $('importFile').onchange = async () => {
     const file = $('importFile').files[0]; $('importFile').value = ''; if (!file) return;
@@ -739,7 +869,7 @@
     catch (e) { toast('That file isn’t a Cheshbon backup'); return; }
     const days = Object.keys(data.logs).length;
     if (!(await ask('Restore this backup?', `It has ${data.traits.length} traits and ${days} day${days === 1 ? '' : 's'} of entries. Everything on this phone will be replaced.`, 'Restore'))) return;
-    S = { theme: 'system', cycleStart: lastSunday(), ...data, setupDone: true };
+    S = { theme: 'system', cycleStart: lastSunday(), reminder: S.reminder, shabbos: true, ...data, setupDone: true };
     save(); applyTheme(); chartStart = null; viewDay = todayKey();
     if (document.body.classList.contains('setup')) closeSetup('today'); else renderAll();
     toast('Backup restored');
@@ -834,10 +964,11 @@
     if (viewDay === lastSeen) viewDay = todayKey();
     lastSeen = todayKey(); chartStart = null; if (current !== 'setup') show(current);
   });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') scheduleReminders(); });
 
   if ('serviceWorker' in navigator && location.protocol === 'https:' && !Cap) navigator.serviceWorker.register('sw.js').catch(() => {});
 
-  applyTheme(); save();
+  applyTheme(); save(); scheduleReminders();
   if (S.setupDone) show('today'); else openSetup(false);
 </script>
 </body>
