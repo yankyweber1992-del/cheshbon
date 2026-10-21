@@ -1,4 +1,4 @@
-const CACHE = 'cheshbon-v6';
+const CACHE = 'cheshbon-v7';
 const FILES = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png',
   './fonts/frank-hebrew-400.woff2', './fonts/frank-hebrew-500.woff2', './fonts/frank-hebrew-700.woff2',
   './fonts/frank-latin-400.woff2', './fonts/frank-latin-500.woff2', './fonts/frank-latin-700.woff2',

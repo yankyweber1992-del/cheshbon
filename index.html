@@ -293,11 +293,9 @@
   <div id="st1" class="welcome">
     <div class="mark">חשבון הנפש</div>
     <h1>Work on one middah each week, and review all of them each night.</h1>
-    <p class="lede">Pick a list to begin with. You can rename, reorder or add to it at any time.</p>
-    <button class="choice" data-c="custom"><b>My own list</b><span>Choose how many traits and name each one</span></button>
+    <p class="lede">Start with the thirteen middos of Cheshbon HaNefesh, or make your own list. You can rename, reorder or add to it at any time.</p>
     <button class="choice" data-c="cheshbon"><b>Cheshbon HaNefesh</b><span>The thirteen middos, with their Hebrew names</span></button>
-    <button class="choice" data-c="everyday"><b>Everyday character</b><span>Seven plain-English traits for daily life</span></button>
-    <button class="choice" data-c="franklin"><b>Benjamin Franklin</b><span>His thirteen virtues</span></button>
+    <button class="choice" data-c="custom"><b>My own list</b><span>Choose how many traits and name each one</span></button>
     <button class="btn plain" id="stRestore" style="margin-top:8px">Restore from a backup</button>
   </div>
 
@@ -400,7 +398,7 @@
   <div class="group" id="traitRows"></div>
   <div class="group" style="margin-top:10px">
     <button class="row add" id="addTrait"><svg class="i"><use href="#i-plus"/></svg><span class="main">Add a trait</span></button>
-    <button class="row" id="newList"><span class="main"><span class="a">Start a new list</span><div class="b">Build your own, or load a preset</div></span><svg class="i side"><use href="#i-right"/></svg></button>
+    <button class="row" id="newList"><span class="main"><span class="a">Start a new list</span><div class="b">Build your own, or use Cheshbon HaNefesh</div></span><svg class="i side"><use href="#i-right"/></svg></button>
   </div>
 
   <div class="group-h">Cycle</div>
@@ -469,30 +467,6 @@
       ['Emes', 'אמת', 'Let nothing leave your mouth that isn’t true.'],
       ['Prishus', 'פרישות', 'Take from permitted pleasures only what you need.']
     ],
-    everyday: [
-      ['Listening', '', 'Let people finish. Hear what they mean before answering.'],
-      ['Patience', '', 'Wait without irritation, with people and with plans.'],
-      ['Staying calm', '', 'Catch anger early and answer slowly.'],
-      ['Gratitude', '', 'Notice what others did for you, and say thank you.'],
-      ['Seeing the good', '', 'Judge people favorably; look for what is right.'],
-      ['Honesty', '', 'Say what is true, including the small things.'],
-      ['Keeping my word', '', 'Do what I said I would, when I said I would.']
-    ],
-    franklin: [
-      ['Temperance', '', 'Eat not to dullness; drink not to elevation.'],
-      ['Silence', '', 'Speak not but what may benefit others or yourself.'],
-      ['Order', '', 'Let all your things have their places.'],
-      ['Resolution', '', 'Perform without fail what you resolve.'],
-      ['Frugality', '', 'Make no expense but to do good to others or yourself.'],
-      ['Industry', '', 'Lose no time; be always employed in something useful.'],
-      ['Sincerity', '', 'Use no hurtful deceit; think innocently and justly.'],
-      ['Justice', '', 'Wrong none by doing injuries or omitting benefits.'],
-      ['Moderation', '', 'Avoid extremes; forbear resenting injuries.'],
-      ['Cleanliness', '', 'Tolerate no uncleanliness in body, clothes, or habitation.'],
-      ['Tranquility', '', 'Be not disturbed at trifles or at accidents common or unavoidable.'],
-      ['Chastity', '', 'Guard your conduct and your thoughts.'],
-      ['Humility', '', 'Be humble.']
-    ]
   };
   const makeTraits = key => PRESETS[key].map(([name, he, desc], i) => ({ id: key + '-' + (i + 1), name, he, desc }));
 
@@ -906,7 +880,7 @@
   document.querySelectorAll('.choice').forEach(b => b.onclick = async () => {
     const c = b.dataset.c;
     if (c === 'custom') { stStep(2); return; }
-    if (setupFromSettings && !(await ask('Replace your list?', 'Your current traits will be swapped for this preset. Past entries are kept.', 'Replace list'))) return;
+    if (setupFromSettings && !(await ask('Replace your list?', 'Your current traits will be swapped for the thirteen middos of Cheshbon HaNefesh. Past entries are kept.', 'Replace list'))) return;
     S.traits = makeTraits(c); if (!S.setupDone) S.cycleStart = lastSunday(); S.setupDone = true;
     save(); closeSetup(setupFromSettings ? 'settings' : 'today'); toast(setupFromSettings ? 'List replaced' : 'You’re set');
   });
