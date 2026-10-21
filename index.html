@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Cheshbon HaNefesh</title>
+  <meta name="description" content="Weekly middos tracker in the method of Cheshbon HaNefesh." />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <style>
+    :root {
+      --bg: #0f172a; --card: #1e293b; --accent: #6366f1; --accent-soft: #818cf8;
+      --text: #f8fafc; --muted: #94a3b8; --border: #334155;
+      --success: #22c55e; --danger: #ef4444; --nav: #111827;
+    }
+    :root[data-theme="light"] {
+      --bg: #f1f5f9; --card: #ffffff; --accent: #4f46e5; --accent-soft: #4338ca;
+      --text: #0f172a; --muted: #64748b; --border: #e2e8f0;
+      --success: #16a34a; --danger: #dc2626; --nav: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    html, body { background: var(--bg); color: var(--text); }
+    body { max-width: 640px; margin: 0 auto; padding: 1rem 1rem calc(5.5rem + env(safe-area-inset-bottom)); }
+    header { text-align: center; margin: 0.5rem 0 1.25rem; }
+    h1 { font-size: 1.5rem; color: var(--accent-soft); }
+    .muted { color: var(--muted); font-size: 0.85rem; }
+    .he { font-family: "Frank Ruehl CLM", "David", "Times New Roman", serif; direction: rtl; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 0.85rem; padding: 1.1rem; margin-bottom: 1rem; }
+    .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+    .focus-card { border: 2px solid var(--accent); background: linear-gradient(135deg, rgba(99,102,241,0.15), var(--card) 70%); }
+    .focus-name { font-size: 1.6rem; font-weight: 700; color: var(--accent-soft); display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+    .focus-name .he { font-size: 1.5rem; }
+    .daynav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .daynav .date { font-weight: 600; text-align: center; }
+    .icon-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); width: 2.5rem; height: 2.5rem; border-radius: 0.6rem; font-size: 1.1rem; cursor: pointer; }
+    .icon-btn:disabled { opacity: 0.35; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .field { display: flex; flex-direction: column; gap: 0.35rem; }
+    label { font-size: 0.8rem; color: var(--muted); }
+    input, textarea, select { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.6rem; border-radius: 0.5rem; font-size: 1rem; width: 100%; }
+    input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+    textarea { min-height: 110px; resize: vertical; }
+    .right { text-align: right; margin-top: 0.6rem; font-size: 0.9rem; color: var(--muted); }
+    .good { color: var(--success); font-weight: 600; }
+    .trait { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+    .trait:last-child { border-bottom: none; }
+    .trait.focus { background: rgba(99,102,241,0.12); border-radius: 0.5rem; padding: 0.7rem 0.5rem; margin: 0 -0.5rem; }
+    .trait-info { flex: 1; min-width: 0; }
+    .trait-name { font-weight: 600; font-size: 0.95rem; display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: baseline; }
+    .trait-desc { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; }
+    .actions { display: flex; gap: 0.4rem; }
+    .st { border: 1px solid var(--border); background: var(--bg); color: var(--muted); width: 2.6rem; height: 2.4rem; border-radius: 0.5rem; cursor: pointer; font-size: 1rem; }
+    .st.pass { background: rgba(34,197,94,0.18); color: var(--success); border-color: var(--success); }
+    .st.lapse { background: rgba(239,68,68,0.18); color: var(--danger); border-color: var(--danger); }
+    .btn { background: var(--accent); color: #fff; border: none; padding: 0.65rem 1rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.95rem; }
+    .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn.danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+    .row { display: flex; gap: 0.5rem; align-items: center; }
+    .stack { display: flex; flex-direction: column; gap: 0.6rem; }
+    .edit-row { display: grid; grid-template-columns: 1fr auto; gap: 0.4rem; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
+    .edit-row .inputs { display: flex; flex-direction: column; gap: 0.35rem; }
+    .edit-row .ops { display: flex; flex-direction: column; gap: 0.3rem; }
+    .mini { background: var(--bg); border: 1px solid var(--border); color: var(--muted); border-radius: 0.4rem; width: 2.1rem; height: 2rem; cursor: pointer; }
+    .mini.del { color: var(--danger); }
+    /* History chart */
+    .chart { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .chart th, .chart td { border: 1px solid var(--border); text-align: center; padding: 0.35rem 0.1rem; }
+    .chart th { color: var(--muted); font-weight: 500; }
+    .chart td.name { text-align: left; padding-left: 0.4rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 7.5rem; }
+    .chart tr.focus td { background: rgba(99,102,241,0.14); }
+    .chart .dot { color: var(--danger); font-size: 1rem; line-height: 1; }
+    .chart .ok { color: var(--success); }
+    .chart th.today { color: var(--accent-soft); }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 0.9rem; }
+    .stat { background: var(--bg); border: 1px solid var(--border); border-radius: 0.6rem; padding: 0.6rem; text-align: center; }
+    .stat b { display: block; font-size: 1.25rem; }
+    .stat span { font-size: 0.72rem; color: var(--muted); }
+    .note-list .note { padding: 0.6rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; white-space: pre-wrap; }
+    .note-list .note:last-child { border-bottom: none; }
+    .note-list .note .d { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.2rem; }
+    /* Bottom nav */
+    nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav); border-top: 1px solid var(--border); display: flex; justify-content: center; padding-bottom: env(safe-area-inset-bottom); z-index: 10; }
+    nav .inner { display: flex; width: 100%; max-width: 640px; }
+    nav button { flex: 1; background: none; border: none; color: var(--muted); padding: 0.7rem 0 0.8rem; font-size: 0.75rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+    nav button svg { width: 22px; height: 22px; }
+    nav button.active { color: var(--accent-soft); font-weight: 600; }
+    .view { display: none; }
+    .view.active { display: block; }
+    .toast { position: fixed; left: 50%; bottom: 5.5rem; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 0.55rem 1rem; border-radius: 2rem; font-size: 0.85rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 20; }
+    .toast.show { opacity: 1; }
+    .setup-row { border: 1px solid var(--border); border-radius: 0.6rem; padding: 0.7rem; display: flex; flex-direction: column; gap: 0.4rem; }
+    .setup-row .num { font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+    .choice { text-align: left; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 0.6rem; padding: 0.85rem; cursor: pointer; width: 100%; }
+    .choice b { display: block; margin-bottom: 0.15rem; }
+    .choice:active { border-color: var(--accent); }
+    body.setup nav { display: none; }
+    #installBtn { display: none; width: 100%; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Cheshbon HaNefesh</h1>
+    <p class="muted">One middah each week · track them all daily</p>
+  </header>
+
+  <button id="installBtn" class="btn">Install app</button>
+
+  <!-- ===== SETUP ===== -->
+  <section id="view-setup" class="view">
+    <div id="setupStep1" class="card">
+      <div class="card-title">Choose your traits</div>
+      <div class="stack">
+        <button class="choice" data-choice="custom"><b>My own traits</b><span class="muted">Decide how many and name each one</span></button>
+        <button class="choice" data-choice="cheshbon"><b>Cheshbon HaNefesh</b><span class="muted">The 13 middos, with Hebrew names</span></button>
+        <button class="choice" data-choice="franklin"><b>Benjamin Franklin</b><span class="muted">His 13 virtues</span></button>
+        <div class="muted">You can edit, add, remove or reorder traits later in Settings.</div>
+        <button class="btn ghost" id="setupRestore">Restore from a backup</button>
+      </div>
+    </div>
+    <div id="setupStep2" class="card" style="display:none">
+      <div class="card-title">How many traits?</div>
+      <div class="stack">
+        <div class="row">
+          <button class="icon-btn" id="countMinus" aria-label="Fewer">−</button>
+          <input type="number" id="setupCount" min="1" max="52" value="7" inputmode="numeric" style="text-align:center;font-size:1.2rem;font-weight:600" />
+          <button class="icon-btn" id="countPlus" aria-label="More">+</button>
+        </div>
+        <div class="muted" id="setupCycleNote"></div>
+        <button class="btn" id="setupNext">Next</button>
+        <button class="btn ghost" id="setupBack1">Back</button>
+      </div>
+    </div>
+    <div id="setupStep3" class="card" style="display:none">
+      <div class="card-title"><span>Name your traits</span><span class="muted">Only the name is required</span></div>
+      <div class="stack" id="setupRows"></div>
+      <div class="stack" style="margin-top:0.9rem">
+        <button class="btn" id="setupDone">Save and start</button>
+        <button class="btn ghost" id="setupBack2">Back</button>
+        <button class="btn ghost" id="setupCancel" style="display:none">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TODAY ===== -->
+  <section id="view-today" class="view active">
+    <div class="daynav">
+      <button class="icon-btn" id="prevDay" aria-label="Previous day">‹</button>
+      <div class="date"><div id="dayLabel"></div><div class="muted" id="daySub"></div></div>
+      <button class="icon-btn" id="nextDay" aria-label="Next day">›</button>
+    </div>
+
+    <div class="card focus-card">
+      <div class="card-title"><span>This Week's Focus</span><span class="muted" id="weekInfo"></span></div>
+      <div class="focus-name"><span id="focusName">—</span><span class="he" id="focusHe"></span></div>
+      <div class="muted" id="focusDesc" style="margin-top:0.35rem"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Sleep</div>
+      <div class="grid2">
+        <div class="field"><label for="sleepTime">Went to sleep (night before)</label><input type="time" id="sleepTime" /></div>
+        <div class="field"><label for="wakeTime">Woke up</label><input type="time" id="wakeTime" /></div>
+      </div>
+      <div class="right">Sleep: <span id="sleepDur" class="good">--</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>Daily Checklist</span><span class="muted" id="checkCount"></span></div>
+      <div id="checklist"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Reflection</div>
+      <textarea id="note" placeholder="Successes, slip-ups, insights..."></textarea>
+    </div>
+  </section>
+
+  <!-- ===== HISTORY ===== -->
+  <section id="view-history" class="view">
+    <div class="daynav">
+      <button class="icon-btn" id="prevWeek" aria-label="Previous week">‹</button>
+      <div class="date"><div id="weekLabel"></div><div class="muted" id="weekSub"></div></div>
+      <button class="icon-btn" id="nextWeek" aria-label="Next week">›</button>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>Week Chart</span><span class="muted">● lapse · ✓ kept</span></div>
+      <div style="overflow-x:auto"><table class="chart" id="chart"></table></div>
+      <div class="stats">
+        <div class="stat"><b id="sLapses">0</b><span>lapses</span></div>
+        <div class="stat"><b id="sFocus">0</b><span>focus lapses</span></div>
+        <div class="stat"><b id="sSleep">--</b><span>avg sleep</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Reflections this week</div>
+      <div class="note-list" id="weekNotes"></div>
+    </div>
+  </section>
+
+  <!-- ===== SETTINGS ===== -->
+  <section id="view-settings" class="view">
+    <div class="card">
+      <div class="card-title">Cycle</div>
+      <div class="stack">
+        <div class="field">
+          <label for="cycleStart">Cycle started on (week 1 begins this day)</label>
+          <input type="date" id="cycleStart" />
+        </div>
+        <div class="muted" id="cycleInfo"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>Your Traits</span><span class="muted" id="traitTotal"></span></div>
+      <div id="editList"></div>
+      <div class="stack" style="margin-top:0.75rem">
+        <input type="text" id="newName" placeholder="Name" />
+        <input type="text" id="newHe" class="he" placeholder="שם בעברית (optional)" />
+        <input type="text" id="newDesc" placeholder="Goal / description" />
+        <button class="btn" id="addBtn">Add trait</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Start a new list</div>
+      <div class="stack">
+        <select id="presetSel">
+          <option value="custom">My own traits</option>
+          <option value="cheshbon">Cheshbon HaNefesh — 13 middos</option>
+          <option value="franklin">Benjamin Franklin — 13 virtues</option>
+        </select>
+        <div class="field" id="countField">
+          <label for="traitCount">How many traits? (one per week)</label>
+          <input type="number" id="traitCount" min="1" max="52" value="7" inputmode="numeric" />
+        </div>
+        <button class="btn ghost" id="loadPreset">Replace current list</button>
+        <div class="muted">Your past logs are kept. Checkmarks only show for traits that are still in the list.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Appearance</div>
+      <select id="themeSel">
+        <option value="system">Match phone</option>
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Backup</div>
+      <div class="stack">
+        <div class="muted">Everything is stored only on this phone. Export a backup now and then — uninstalling the app or clearing its data erases it.</div>
+        <div class="row">
+          <button class="btn" id="exportBtn" style="flex:1">Export backup</button>
+          <button class="btn ghost" id="importBtn" style="flex:1">Import backup</button>
+        </div>
+        <input type="file" id="importFile" accept="application/json,.json" hidden />
+        <div class="muted" id="lastBackup"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Reset</div>
+      <button class="btn danger" id="resetBtn" style="width:100%">Erase all data</button>
+    </div>
+  </section>
+
+  <nav>
+    <div class="inner">
+      <button data-view="today" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Today
+      </button>
+      <button data-view="history">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>History
+      </button>
+      <button data-view="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Settings
+      </button>
+    </div>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---------- Presets ----------
+    const PRESETS = {
+      cheshbon: [
+        ['Menuchas HaNefesh', 'מנוחת הנפש', 'Stay settled; don’t let passing events or small worries unsettle you.'],
+        ['Savlanus', 'סבלנות', 'Bear what happens calmly, without anger or complaint.'],
+        ['Seder', 'סדר', 'Everything has its place and its time.'],
+        ['Charitzus', 'חריצות', 'Decide firmly what to do, and then do it.'],
+        ['Nekiyus', 'נקיות', 'Keep yourself, your things and your actions clean.'],
+        ['Anavah', 'ענוה', 'Look for your own shortcomings and others’ virtues.'],
+        ['Tzedek', 'צדק', 'Give up what you are entitled to, for the sake of others.'],
+        ['Kimutz', 'קימוץ', 'Don’t waste money or things, even small ones.'],
+        ['Zerizus', 'זריזות', 'Don’t waste time; act promptly on what needs doing.'],
+        ['Shtikah', 'שתיקה', 'Think before speaking; say only what is useful.'],
+        ['Nachas', 'נחת', 'Speak gently and calmly, with respect for everyone.'],
+        ['Emes', 'אמת', 'Let nothing leave your mouth that isn’t true.'],
+        ['Prishus', 'פרישות', 'Take from permitted pleasures only what you need.']
+      ],
+      franklin: [
+        ['Temperance', '', 'Eat not to dullness; drink not to elevation.'],
+        ['Silence', '', 'Speak not but what may benefit others or yourself.'],
+        ['Order', '', 'Let all your things have their places.'],
+        ['Resolution', '', 'Perform without fail what you resolve.'],
+        ['Frugality', '', 'Make no expense but to do good to others or yourself.'],
+        ['Industry', '', 'Lose no time; be always employed in something useful.'],
+        ['Sincerity', '', 'Use no hurtful deceit; think innocently and justly.'],
+        ['Justice', '', 'Wrong none by doing injuries or omitting benefits.'],
+        ['Moderation', '', 'Avoid extremes; forbear resenting injuries.'],
+        ['Cleanliness', '', 'Tolerate no uncleanliness in body, clothes, or habitation.'],
+        ['Tranquility', '', 'Be not disturbed at trifles or at accidents common or unavoidable.'],
+        ['Chastity', '', 'Guard your conduct and your thoughts.'],
+        ['Humility', '', 'Be humble.']
+      ]
+    };
+    const makeTraits = key => PRESETS[key].map(([name, he, desc], i) => ({ id: key + '-' + (i + 1), name, he, desc }));
+
+    // ---------- Dates (local time, never UTC) ----------
+    const pad = n => String(n).padStart(2, '0');
+    const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const parseKey = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+    const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+    const daysBetween = (a, b) => Math.round((parseKey(keyOf(b)) - parseKey(keyOf(a))) / 86400000);
+    const todayKey = () => keyOf(new Date());
+    const lastSunday = () => { const d = new Date(); return addDays(d, -d.getDay()); };
+
+    // ---------- State ----------
+    const STORE = 'cheshbon_v2';
+    function load() {
+      try { const s = JSON.parse(localStorage.getItem(STORE)); if (s && s.traits) return s; } catch (e) {}
+      // Migrate from the earlier tracker if present
+      let logs = {}, traits = null;
+      try { logs = JSON.parse(localStorage.getItem('vt_logs')) || {}; } catch (e) {}
+      try { traits = JSON.parse(localStorage.getItem('vt_traits')); } catch (e) {}
+      Object.values(logs).forEach(l => { l.note = l.reflection || ''; delete l.reflection; });
+      const migrated = !!(traits && traits.length);
+      return {
+        setupDone: migrated,
+        traits: traits && traits.length ? traits.map(t => ({ he: '', ...t })) : makeTraits('cheshbon'),
+        cycleStart: keyOf(lastSunday()),
+        logs, theme: 'system', lastBackup: null
+      };
+    }
+    let S = load();
+    function save() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) { toast('Could not save'); } }
+
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 1800); }
+
+    // ---------- Cycle ----------
+    function weekIndexFor(dateKey) {
+      const diff = daysBetween(parseKey(S.cycleStart), parseKey(dateKey));
+      return Math.floor(diff / 7);
+    }
+    function focusFor(dateKey) {
+      const n = S.traits.length;
+      if (!n) return null;
+      const w = weekIndexFor(dateKey);
+      const idx = ((w % n) + n) % n;
+      return { trait: S.traits[idx], idx, week: w, round: Math.floor(w / n) + 1 };
+    }
+
+    // ---------- Today view ----------
+    let viewDay = todayKey();
+    const fmtDay = k => parseKey(k).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+
+    function dayLog(k, create) {
+      if (!S.logs[k] && create) S.logs[k] = { traits: {} };
+      if (S.logs[k] && !S.logs[k].traits) S.logs[k].traits = {};
+      return S.logs[k] || { traits: {} };
+    }
+
+    function renderToday() {
+      const t = todayKey();
+      $('dayLabel').textContent = viewDay === t ? 'Today' : fmtDay(viewDay);
+      $('daySub').textContent = viewDay === t ? fmtDay(viewDay) : (daysBetween(parseKey(viewDay), new Date()) === 1 ? 'Yesterday' : '');
+      $('nextDay').disabled = viewDay >= t;
+
+      const f = focusFor(viewDay);
+      if (!f) {
+        $('focusName').textContent = 'No middos set'; $('focusHe').textContent = '';
+        $('focusDesc').textContent = 'Add some in Settings.'; $('weekInfo').textContent = '';
+      } else {
+        $('focusName').textContent = f.trait.name;
+        $('focusHe').textContent = f.trait.he || '';
+        $('focusDesc').textContent = f.trait.desc || '';
+        $('weekInfo').textContent = f.week < 0 ? 'Before cycle start' : `Week ${f.idx + 1} of ${S.traits.length}` + (f.round > 1 ? ` · Round ${f.round}` : '');
+      }
+
+      const log = dayLog(viewDay);
+      $('sleepTime').value = log.sleepTime || '';
+      $('wakeTime').value = log.wakeTime || '';
+      $('note').value = log.note || '';
+      renderSleep();
+      renderChecklist();
+    }
+
+    function renderChecklist() {
+      const log = dayLog(viewDay);
+      const f = focusFor(viewDay);
+      // Focus middah first, then the rest in order
+      const ordered = f ? [f.trait, ...S.traits.filter(t => t.id !== f.trait.id)] : S.traits;
+      let lapses = 0, marked = 0;
+      $('checklist').innerHTML = ordered.map(tr => {
+        const st = log.traits[tr.id] || 'none';
+        if (st !== 'none') marked++;
+        if (st === 'lapse') lapses++;
+        const isFocus = f && tr.id === f.trait.id;
+        return `<div class="trait${isFocus ? ' focus' : ''}">
+          <div class="trait-info">
+            <div class="trait-name">${esc(tr.name)}${tr.he ? `<span class="he muted">${esc(tr.he)}</span>` : ''}</div>
+            ${tr.desc ? `<div class="trait-desc">${esc(tr.desc)}</div>` : ''}
+          </div>
+          <div class="actions">
+            <button class="st ${st === 'pass' ? 'pass' : ''}" data-id="${esc(tr.id)}" data-type="pass" aria-label="Kept">✓</button>
+            <button class="st ${st === 'lapse' ? 'lapse' : ''}" data-id="${esc(tr.id)}" data-type="lapse" aria-label="Lapsed">✕</button>
+          </div>
+        </div>`;
+      }).join('');
+      $('checkCount').textContent = S.traits.length ? `${marked}/${S.traits.length}` : '';
+    }
+
+    $('checklist').addEventListener('click', e => {
+      const b = e.target.closest('.st'); if (!b) return;
+      const log = dayLog(viewDay, true);
+      const cur = log.traits[b.dataset.id];
+      if (cur === b.dataset.type) delete log.traits[b.dataset.id];
+      else log.traits[b.dataset.id] = b.dataset.type;
+      save(); renderChecklist();
+      if (navigator.vibrate) navigator.vibrate(10);
+    });
+
+    function sleepMinutes(log) {
+      if (!log || !log.sleepTime || !log.wakeTime) return null;
+      const [sh, sm] = log.sleepTime.split(':').map(Number);
+      const [wh, wm] = log.wakeTime.split(':').map(Number);
+      let s = sh * 60 + sm, w = wh * 60 + wm;
+      if (w <= s) w += 1440;
+      return w - s;
+    }
+    const fmtMin = m => m == null ? '--' : `${Math.floor(m / 60)}h ${pad(Math.round(m % 60))}m`;
+    function renderSleep() { $('sleepDur').textContent = fmtMin(sleepMinutes(dayLog(viewDay))); }
+
+    ['sleepTime', 'wakeTime'].forEach(id => $(id).addEventListener('change', () => {
+      dayLog(viewDay, true)[id] = $(id).value; save(); renderSleep();
+    }));
+    $('note').addEventListener('input', () => { dayLog(viewDay, true).note = $('note').value; save(); });
+
+    $('prevDay').onclick = () => { viewDay = keyOf(addDays(parseKey(viewDay), -1)); renderToday(); };
+    $('nextDay').onclick = () => { if (viewDay < todayKey()) { viewDay = keyOf(addDays(parseKey(viewDay), 1)); renderToday(); } };
+
+    // ---------- History view ----------
+    let viewWeekStart = null; // key of first day of the displayed cycle week
+    function cycleWeekStart(dateKey) {
+      const w = weekIndexFor(dateKey);
+      return keyOf(addDays(parseKey(S.cycleStart), w * 7));
+    }
+    function renderHistory() {
+      if (!viewWeekStart) viewWeekStart = cycleWeekStart(todayKey());
+      const start = parseKey(viewWeekStart);
+      const days = Array.from({ length: 7 }, (_, i) => keyOf(addDays(start, i)));
+      const f = focusFor(viewWeekStart);
+      const t = todayKey();
+
+      $('weekLabel').textContent = f ? f.trait.name + (f.trait.he ? ' · ' + f.trait.he : '') : 'Week';
+      $('weekSub').textContent = `${parseKey(days[0]).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${parseKey(days[6]).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
+      $('nextWeek').disabled = days[6] >= t;
+
+      let html = '<tr><th></th>' + days.map(k => `<th class="${k === t ? 'today' : ''}">${parseKey(k).toLocaleDateString(undefined, { weekday: 'narrow' })}</th>`).join('') + '</tr>';
+      let lapses = 0, focusLapses = 0;
+      S.traits.forEach(tr => {
+        const isFocus = f && tr.id === f.trait.id;
+        html += `<tr class="${isFocus ? 'focus' : ''}"><td class="name">${esc(tr.name)}</td>` + days.map(k => {
+          const st = S.logs[k]?.traits?.[tr.id];
+          if (st === 'lapse') { lapses++; if (isFocus) focusLapses++; return '<td><span class="dot">●</span></td>'; }
+          if (st === 'pass') return '<td><span class="ok">✓</span></td>';
+          return '<td></td>';
+        }).join('') + '</tr>';
+      });
+      $('chart').innerHTML = html;
+
+      const sleeps = days.map(k => sleepMinutes(S.logs[k])).filter(m => m != null);
+      $('sLapses').textContent = lapses;
+      $('sFocus').textContent = focusLapses;
+      $('sSleep').textContent = sleeps.length ? fmtMin(sleeps.reduce((a, b) => a + b, 0) / sleeps.length) : '--';
+
+      const notes = days.filter(k => S.logs[k]?.note?.trim());
+      $('weekNotes').innerHTML = notes.length
+        ? notes.map(k => `<div class="note"><div class="d">${esc(fmtDay(k))}</div>${esc(S.logs[k].note)}</div>`).join('')
+        : '<div class="muted">No reflections this week.</div>';
+    }
+    $('prevWeek').onclick = () => { viewWeekStart = keyOf(addDays(parseKey(viewWeekStart), -7)); renderHistory(); };
+    $('nextWeek').onclick = () => { viewWeekStart = keyOf(addDays(parseKey(viewWeekStart), 7)); renderHistory(); };
+
+    // ---------- Settings view ----------
+    function renderSettings() {
+      $('cycleStart').value = S.cycleStart;
+      const f = focusFor(todayKey());
+      $('cycleInfo').textContent = f && f.week >= 0
+        ? `${S.traits.length}-week cycle. This week is week ${f.idx + 1}: ${f.trait.name}.`
+        : `${S.traits.length}-week cycle.`;
+      $('themeSel').value = S.theme || 'system';
+      $('traitTotal').textContent = `${S.traits.length} · ${S.traits.length}-week cycle`;
+      $('countField').style.display = $('presetSel').value === 'custom' ? '' : 'none';
+      $('lastBackup').textContent = S.lastBackup ? `Last backup: ${fmtDay(S.lastBackup)}` : 'No backup yet.';
+
+      $('editList').innerHTML = S.traits.map((tr, i) => `
+        <div class="edit-row" data-i="${i}">
+          <div class="inputs">
+            <input type="text" data-k="name" value="${esc(tr.name)}" placeholder="Name" />
+            <input type="text" data-k="he" class="he" value="${esc(tr.he)}" placeholder="עברית" />
+            <input type="text" data-k="desc" value="${esc(tr.desc)}" placeholder="Goal / description" />
+          </div>
+          <div class="ops">
+            <button class="mini" data-op="up" aria-label="Move up" ${i === 0 ? 'disabled' : ''}>↑</button>
+            <button class="mini" data-op="down" aria-label="Move down" ${i === S.traits.length - 1 ? 'disabled' : ''}>↓</button>
+            <button class="mini del" data-op="del" aria-label="Delete">✕</button>
+          </div>
+        </div>`).join('');
+    }
+    $('editList').addEventListener('change', e => {
+      const row = e.target.closest('.edit-row'); if (!row || !e.target.dataset.k) return;
+      S.traits[+row.dataset.i][e.target.dataset.k] = e.target.value.trim();
+      save(); toast('Saved');
+    });
+    $('editList').addEventListener('click', e => {
+      const b = e.target.closest('.mini'); if (!b) return;
+      const i = +b.closest('.edit-row').dataset.i;
+      if (b.dataset.op === 'del') {
+        if (!confirm(`Remove "${S.traits[i].name}"?`)) return;
+        S.traits.splice(i, 1);
+      } else {
+        const j = b.dataset.op === 'up' ? i - 1 : i + 1;
+        [S.traits[i], S.traits[j]] = [S.traits[j], S.traits[i]];
+      }
+      save(); renderSettings();
+    });
+    $('addBtn').onclick = () => {
+      const name = $('newName').value.trim(); if (!name) return toast('Enter a name');
+      S.traits.push({ id: 'c-' + Date.now(), name, he: $('newHe').value.trim(), desc: $('newDesc').value.trim() });
+      $('newName').value = $('newHe').value = $('newDesc').value = '';
+      save(); renderSettings(); toast('Added');
+    };
+    $('presetSel').onchange = () => { $('countField').style.display = $('presetSel').value === 'custom' ? '' : 'none'; };
+    $('loadPreset').onclick = () => {
+      const key = $('presetSel').value;
+      if (key === 'custom') {
+        const n = clampCount($('traitCount').value);
+        openSetup(3, n, true);
+        return;
+      }
+      if (!confirm('Replace your current list with this preset?')) return;
+      S.traits = makeTraits(key); save(); renderSettings(); toast('Preset loaded');
+    };
+
+    // ---------- Setup (first run, or building a custom list) ----------
+    const clampCount = v => Math.max(1, Math.min(52, parseInt(v) || 1));
+    let setupFromSettings = false;
+    function setupStep(n) { [1, 2, 3].forEach(i => $('setupStep' + i).style.display = i === n ? '' : 'none'); window.scrollTo(0, 0); }
+    function updateCycleNote() {
+      const n = clampCount($('setupCount').value);
+      $('setupCycleNote').textContent = `One trait per week, so a full round takes ${n} week${n > 1 ? 's' : ''}. You track all of them every day.`;
+    }
+    function buildRows(n) {
+      const old = [...$('setupRows').querySelectorAll('.setup-row')].map(r => ({
+        name: r.querySelector('[data-k=name]').value, he: r.querySelector('[data-k=he]').value, desc: r.querySelector('[data-k=desc]').value }));
+      $('setupRows').innerHTML = Array.from({ length: n }, (_, i) => {
+        const o = old[i] || { name: '', he: '', desc: '' };
+        return `<div class="setup-row">
+          <div class="num">Week ${i + 1}</div>
+          <input type="text" data-k="name" placeholder="Trait name" value="${esc(o.name)}" />
+          <input type="text" data-k="he" class="he" placeholder="עברית (optional)" value="${esc(o.he)}" />
+          <input type="text" data-k="desc" placeholder="Goal / description (optional)" value="${esc(o.desc)}" />
+        </div>`;
+      }).join('');
+    }
+    function openSetup(step, count, fromSettings) {
+      setupFromSettings = !!fromSettings;
+      $('setupCancel').style.display = fromSettings ? '' : 'none';
+      $('setupBack2').style.display = fromSettings ? 'none' : '';
+      if (count) { $('setupCount').value = count; buildRows(count); }
+      updateCycleNote();
+      document.body.classList.add('setup');
+      document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-setup'));
+      setupStep(step);
+    }
+    function closeSetup(view) { document.body.classList.remove('setup'); show(view); }
+
+    document.querySelectorAll('.choice').forEach(b => b.onclick = () => {
+      const c = b.dataset.choice;
+      if (c === 'custom') { setupStep(2); updateCycleNote(); return; }
+      S.traits = makeTraits(c); S.setupDone = true; S.cycleStart = keyOf(lastSunday());
+      save(); closeSetup('today'); toast('Ready');
+    });
+    $('setupCount').oninput = updateCycleNote;
+    $('countMinus').onclick = () => { $('setupCount').value = clampCount($('setupCount').value) - 1 || 1; updateCycleNote(); };
+    $('countPlus').onclick = () => { $('setupCount').value = Math.min(52, clampCount($('setupCount').value) + 1); updateCycleNote(); };
+    $('setupRestore').onclick = () => $('importFile').click();
+    $('setupBack1').onclick = () => setupStep(1);
+    $('setupNext').onclick = () => { const n = clampCount($('setupCount').value); $('setupCount').value = n; buildRows(n); setupStep(3); };
+    $('setupBack2').onclick = () => setupStep(2);
+    $('setupCancel').onclick = () => closeSetup('settings');
+    $('setupDone').onclick = () => {
+      const rows = [...$('setupRows').querySelectorAll('.setup-row')];
+      const list = rows.map((r, i) => ({
+        id: 'c-' + Date.now() + '-' + i,
+        name: r.querySelector('[data-k=name]').value.trim(),
+        he: r.querySelector('[data-k=he]').value.trim(),
+        desc: r.querySelector('[data-k=desc]').value.trim()
+      }));
+      const missing = list.findIndex(t => !t.name);
+      if (missing >= 0) { toast(`Name trait ${missing + 1}`); rows[missing].querySelector('[data-k=name]').focus(); return; }
+      if (setupFromSettings && !confirm('Replace your current list with these traits?')) return;
+      S.traits = list;
+      if (!S.setupDone) S.cycleStart = keyOf(lastSunday());
+      S.setupDone = true; viewWeekStart = null;
+      save(); closeSetup(setupFromSettings ? 'settings' : 'today'); toast('Saved');
+    };
+    $('cycleStart').addEventListener('change', () => {
+      if (!$('cycleStart').value) return;
+      S.cycleStart = $('cycleStart').value; viewWeekStart = null; save(); renderSettings(); toast('Cycle updated');
+    });
+
+    function applyTheme() {
+      const th = S.theme || 'system';
+      const dark = th === 'dark' || (th === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      document.querySelector('meta[name=theme-color]').content = dark ? '#0f172a' : '#f1f5f9';
+    }
+    $('themeSel').addEventListener('change', () => { S.theme = $('themeSel').value; save(); applyTheme(); });
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+
+    // Backup
+    $('exportBtn').onclick = async () => {
+      S.lastBackup = todayKey(); save();
+      const json = JSON.stringify({ app: 'cheshbon-hanefesh', version: 2, exported: new Date().toISOString(), data: S }, null, 2);
+      const name = `cheshbon-backup-${todayKey()}.json`;
+      const file = new File([json], name, { type: 'application/json' });
+      try {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Cheshbon HaNefesh backup' }); }
+        else { const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
+        toast('Backup ready');
+      } catch (e) { if (e.name !== 'AbortError') toast('Export failed'); }
+      renderSettings();
+    };
+    $('importBtn').onclick = () => $('importFile').click();
+    $('importFile').onchange = async () => {
+      const f = $('importFile').files[0]; if (!f) return;
+      try {
+        const obj = JSON.parse(await f.text());
+        const data = obj.data || obj;
+        if (!Array.isArray(data.traits) || typeof data.logs !== 'object') throw new Error('bad');
+        if (!confirm('Replace everything on this phone with this backup?')) return;
+        S = { theme: 'system', cycleStart: keyOf(lastSunday()), ...data, setupDone: true };
+        save(); applyTheme(); viewWeekStart = null; renderAll(); if (document.body.classList.contains('setup')) closeSetup('today'); toast('Backup restored');
+      } catch (e) { toast('That file is not a valid backup'); }
+      $('importFile').value = '';
+    };
+    $('resetBtn').onclick = () => {
+      if (!confirm('Erase all middos, logs and notes? This cannot be undone.')) return;
+      localStorage.removeItem(STORE); localStorage.removeItem('vt_traits'); localStorage.removeItem('vt_logs'); S = load(); save(); applyTheme(); viewWeekStart = null; renderAll(); openSetup(1); toast('Erased');
+    };
+
+    // ---------- Navigation ----------
+    function show(view) {
+      document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + view));
+      document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+      if (view === 'today') renderToday();
+      if (view === 'history') renderHistory();
+      if (view === 'settings') renderSettings();
+      window.scrollTo(0, 0);
+    }
+    document.querySelectorAll('nav button').forEach(b => b.onclick = () => show(b.dataset.view));
+    function renderAll() { renderToday(); renderHistory(); renderSettings(); }
+
+    // Roll over to the new day if the app is left open past midnight
+    let lastSeen = todayKey();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && todayKey() !== lastSeen) {
+        if (viewDay === lastSeen) viewDay = todayKey();
+        lastSeen = todayKey(); viewWeekStart = null; renderAll();
+      }
+    });
+
+    // ---------- Install + offline ----------
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; $('installBtn').style.display = 'block'; });
+    $('installBtn').onclick = async () => { if (!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; $('installBtn').style.display = 'none'; };
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    }
+
+    applyTheme();
+    if (S.setupDone === undefined) S.setupDone = true;
+    save();
+    renderAll();
+    if (!S.setupDone) openSetup(1);
+  </script>
+</body>
+</html>
